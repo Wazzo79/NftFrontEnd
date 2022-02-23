@@ -1,1 +1,22 @@
-<h1>This is Mint</h1>
+<div class="row">
+    <div class="col-lg-12">
+        <h1>Cold Behavior - My Artists</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card-group">
+            <div class="card" repeat.for="nft of nfts">
+                <img class="card-img-top" src.bind="token.image" alt="token" /> 
+                <div class="card-body">
+                    <h5 class="card-title">${token.title}</h5>
+                    <p class="card-text">${token.description}</p>
+                </div>  
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-lg-4">
+
+</div>
+</div>

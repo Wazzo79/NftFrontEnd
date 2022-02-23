@@ -1,32 +1,34 @@
 import { inject } from "aurelia";
-import detectEthereumProvider from "@metamask/detect-provider";
+import { ITokenContract } from "../interfaces/ITokenContract";
 import { Toastr } from "./toastr";
+
+const CHAIN_ID = 4;
+const CHAIN_ID_HEX = "0x4";
 
 @inject(Toastr)
 export class Chain {
     public currentAccount: string;
-    isConnected: boolean;
-    provider: any;
-
+    public ethereum: any;
+    public isConnected: boolean;
+    public nftContract: ITokenContract;
+    
     constructor(
         public toastr: Toastr
     ) {
         this.currentAccount = "";
         this.isConnected = false;
-    }
-
-    async attached() {
-        this.provider = await detectEthereumProvider();
-        if (this.provider) {
-            this.initialize();
-        } else {
-            this.toastr.error("Please install Metamask to continue", "Error");
-        }
+        this.ethereum = (window as any).ethereum;
+        this.nftContract = {
+            abi: [],
+            address: "",
+            currentSupply: 0,
+            totalSupply: 0
+        };
     }
 
     connect() {
         let self = this;
-        (window as any).ethereum
+        this.ethereum
             .request({ method: 'eth_requestAccounts' })
             .then((accounts) => {
                 if (accounts.length === 0) {
@@ -34,22 +36,18 @@ export class Chain {
                     this.toastr.error("Please create an account in Metamask", "Error");
                   } else if (accounts[0] !== self.currentAccount) {
                     self.currentAccount = accounts[0];
-                    // Do any other work!
+                    self.isConnected = true;
+                    debugger;
+                    if (self.ethereum.networkVersion != CHAIN_ID) {
+                        self.ethereum
+                            .request({method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_ID_HEX}]});
+                    }
+                    self.ethereum.on('chainChanged', () => window.location.reload());
                   }
             })
             .catch((err) => {
-                
+                self.isConnected = false;
             });
         
-    }
-
-    disconnect() {
-        this.isConnected = false;
-    }
-
-    initialize() {
-        if (this.provider !== window.ethereum) {
-            this.toastr.error("Do you have multiple wallets installed?", "Error");
-          }
     }
 }

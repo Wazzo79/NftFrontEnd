@@ -1,7 +1,12 @@
-import { IRouteViewModel, Params } from "aurelia";
+import { Chain } from "../services/chain";
+import { inject, IRouteViewModel, Params } from "aurelia";
+import { INft } from "../interfaces/INft";
 
+@inject(Chain)
 export class Mint {
-    async load(params: Params) {
+    nfts: INft[];
+
+    constructor(public chain: Chain) {
         
     }
 }
